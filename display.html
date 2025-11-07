@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Scroll Race - Display</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Scroll Race Multiplayer Display">
+    <meta name="author" content="Rick van der Wolk">
+    <link rel="stylesheet" href="css/display.css">
+</head>
+<body>
+    <div id="display-container">
+        <h1 id="title">SCROLL RACE</h1>
+
+        <div id="main-screen" class="screen">
+            <!-- Countdown overlay -->
+            <div id="countdown-overlay" class="hidden">
+                <h2 id="countdown-text"></h2>
+            </div>
+
+            <!-- Waiting content -->
+            <div id="waiting-content">
+                <div id="join-info">
+                    <h2>Join the race!</h2>
+                    <div class="join-methods">
+                        <div class="qr-section">
+                            <img id="qr-code" class="qr-code" alt="QR Code" style="display: none;">
+                        </div>
+                        <div class="url-section">
+                            <p id="join-url" class="join-url">...</p>
+                        </div>
+                    </div>
+                    <p class="waiting-text">Waiting for players...</p>
+                </div>
+
+                <div id="player-list">
+                    <h3>Players:</h3>
+                    <ul id="players"></ul>
+                </div>
+            </div>
+
+            <!-- Race content -->
+            <div id="race-content" class="hidden">
+                <div id="racers"></div>
+            </div>
+
+            <!-- Results content -->
+            <div id="results-content" class="hidden">
+                <h2>Race Finished!</h2>
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/display.js"></script>
+</body>
+</html>

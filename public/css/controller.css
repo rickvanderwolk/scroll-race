@@ -1,0 +1,259 @@
+html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    background: #0a0a0a;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+body.racing {
+    overflow-y: auto !important;
+    height: auto;
+}
+
+#controller-container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.screen {
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.screen.hidden {
+    display: none;
+}
+
+/* Join Screen */
+#join-screen h1 {
+    font-size: 3em;
+    margin-bottom: 40px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: #ff0000;
+    text-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4);
+    text-transform: uppercase;
+}
+
+#join-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#player-name {
+    font-size: 1.5em;
+    padding: 18px;
+    border: 2px solid #555;
+    border-radius: 3px;
+    background: #1a1a1a;
+    color: white;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+#player-name:focus {
+    outline: none;
+    border-color: #ff0000;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+#player-name::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.button {
+    background: #ff0000;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-size: 2em;
+    padding: 20px 40px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.1s ease;
+    box-shadow: 0 6px 0 #990000;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.button:hover {
+    background: #ff1a1a;
+    box-shadow: 0 6px 0 #990000;
+}
+
+.button:active {
+    transform: translateY(3px);
+    box-shadow: 0 3px 0 #990000;
+}
+
+/* Waiting Screen */
+#waiting-screen h2 {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+    color: #aaa;
+}
+
+.player-name {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 20px 0 40px 0;
+}
+
+.leader-badge {
+    font-size: 1.5em;
+    margin: 20px 0;
+    color: #ff0000;
+    background: #1a1a1a;
+    padding: 15px 25px;
+    border-radius: 3px;
+    border: 2px solid #ff0000;
+    display: inline-block;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+}
+
+#leader-controls {
+    margin-top: 40px;
+}
+
+.waiting-message {
+    font-size: 1.5em;
+    margin: 40px 20px;
+    color: #aaa;
+    line-height: 1.5;
+}
+
+/* Countdown Screen */
+#countdown-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+}
+
+#countdown-screen #countdown-text {
+    font-size: 15em;
+    margin: 0;
+    font-weight: 900;
+    color: #ff0000;
+    text-shadow:
+        0 0 40px rgba(255, 0, 0, 1),
+        0 0 80px rgba(255, 0, 0, 0.8),
+        0 0 120px rgba(255, 0, 0, 0.6),
+        0 10px 0 #000;
+    animation: countdownPulse 1s ease-out;
+    text-transform: uppercase;
+}
+
+@keyframes countdownPulse {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Race Screen */
+#race-screen {
+    width: 100%;
+    min-height: 100vh;
+    padding: 0;
+}
+
+#race-track {
+    height: 200%;
+    width: calc(100% - 100px);
+    background: #333;
+    border: 50px dashed #fff;
+    border-top: 0;
+    border-bottom: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 50px;
+}
+
+#position-text {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 4em;
+    margin: 0;
+    color: #ff0000;
+    text-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 4px 0 #000;
+    z-index: 100;
+    font-weight: bold;
+}
+
+/* Finished Screen */
+#finished-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+}
+
+#finished-screen h1 {
+    font-size: 5em;
+    margin: 0 0 30px 0;
+    color: #ff0000;
+    text-shadow: 0 0 30px rgba(255, 0, 0, 0.8), 0 4px 0 #000;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+#finish-time,
+#finish-position {
+    font-size: 2em;
+    margin: 10px 0;
+}
+
+/* Responsive */
+@media only screen and (max-width: 768px) {
+    #join-screen h1 {
+        font-size: 2.5em;
+    }
+
+    #countdown-text {
+        font-size: 8em;
+    }
+
+    #position-text {
+        font-size: 3em;
+    }
+
+    #finished-screen h1 {
+        font-size: 3.5em;
+    }
+}

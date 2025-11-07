@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Scroll Race - Controller</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Scroll Race Controller">
+    <meta name="author" content="Rick van der Wolk">
+    <link rel="stylesheet" href="css/controller.css">
+</head>
+<body>
+    <div id="controller-container">
+        <div id="join-screen" class="screen">
+            <h1>SCROLL RACE</h1>
+            <div id="join-form">
+                <input type="text" id="player-name" placeholder="Your name" maxlength="20" autocomplete="off">
+                <button id="join-button" class="button">JOIN</button>
+            </div>
+        </div>
+
+        <div id="waiting-screen" class="screen hidden">
+            <h2>Joined as:</h2>
+            <p id="player-name-display" class="player-name"></p>
+            <div id="leader-controls" class="hidden">
+                <p class="leader-badge">👑 Race starter</p>
+                <button id="start-button" class="button">START RACE</button>
+            </div>
+            <div id="non-leader-message" class="hidden">
+                <p class="waiting-message">Waiting for Player 1 to start the race...</p>
+            </div>
+        </div>
+
+        <div id="countdown-screen" class="screen hidden">
+            <h1 id="countdown-text"></h1>
+        </div>
+
+        <div id="race-screen" class="screen hidden">
+            <div id="race-track">
+                <h1 id="position-text">0</h1>
+            </div>
+        </div>
+
+        <div id="finished-screen" class="screen hidden">
+            <h1>FINISHED!</h1>
+            <p id="finish-time"></p>
+            <p id="finish-position"></p>
+            <div id="leader-reset-controls" class="hidden">
+                <button id="reset-button" class="button">NEW RACE</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/controller.js"></script>
+</body>
+</html>
