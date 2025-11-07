@@ -59,6 +59,7 @@ function handleMessage(data) {
 
         case 'startCountdown':
             gameState = 'COUNTDOWN';
+            document.getElementById('countdown-text').textContent = '3';
             showScreen('countdown');
             break;
 
