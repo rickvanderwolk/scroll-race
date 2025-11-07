@@ -43,10 +43,10 @@ function handleMessage(data) {
             break;
 
         case 'playerDisconnected':
-            const player = players.find(p => p.id === data.playerId);
-            if (player) {
-                player.connected = false;
-                updatePlayerList();
+            // Remove player from array completely
+            players = players.filter(p => p.id !== data.playerId);
+            updatePlayerList();
+            if (gameState === 'RACING') {
                 updateRaceDisplay();
             }
             break;
@@ -120,6 +120,7 @@ function handleMessage(data) {
 
         case 'resetRace':
             gameState = 'WAITING';
+            // Reset existing players (disconnected players are already removed)
             players.forEach(p => {
                 p.position = 0;
                 delete p.finished;
@@ -164,9 +165,6 @@ function updatePlayerList() {
         players.forEach(player => {
             const li = document.createElement('li');
             li.textContent = `Player ${player.playerNumber}: ${player.name}`;
-            if (!player.connected) {
-                li.classList.add('disconnected');
-            }
             playersList.appendChild(li);
         });
     }
@@ -243,16 +241,9 @@ function updateRaceDisplay() {
             // Update position/place
             if (player.finished) {
                 positionDiv.textContent = player.finishPosition ? `#${player.finishPosition}` : '✓';
+                racerDiv.classList.add('finished');
             } else {
                 positionDiv.textContent = `${index + 1}`;
-            }
-
-            if (!player.connected) {
-                racerDiv.classList.add('disconnected');
-            }
-
-            if (player.finished) {
-                racerDiv.classList.add('finished');
             }
         }
     });

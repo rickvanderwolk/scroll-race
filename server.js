@@ -73,9 +73,15 @@ wss.on('connection', (ws) => {
     ws.on('close', () => {
         const player = players.find(p => p.ws === ws);
         if (player) {
-            player.connected = false;
             console.log(`Player ${player.name} disconnected`);
+
+            // Remove player completely from the array
+            players = players.filter(p => p.id !== player.id);
+
             broadcast({ type: 'playerDisconnected', playerId: player.id });
+
+            // Check if all controllers are now disconnected
+            checkAndResetIfNoControllers();
         }
 
         // If display disconnects, just log it
@@ -89,16 +95,15 @@ function handleMessage(ws, data) {
     switch (data.type) {
         case 'joinDisplay':
             ws.isDisplay = true;
-            // Send current game state to display - only connected players
+            // Send current game state to display
             ws.send(JSON.stringify({
                 type: 'gameState',
                 state: gameState,
-                players: players.filter(p => p.connected).map(p => ({
+                players: players.map(p => ({
                     id: p.id,
                     name: p.name,
                     playerNumber: p.playerNumber,
                     position: p.position,
-                    connected: p.connected,
                     isLeader: p.id === leaderId
                 }))
             }));
@@ -107,16 +112,14 @@ function handleMessage(ws, data) {
         case 'joinPlayer':
             const playerId = Date.now().toString();
 
-            // Get next player number (only count connected players)
-            const connectedPlayers = players.filter(p => p.connected);
-            const playerNumber = connectedPlayers.length + 1;
+            // Get next player number
+            const playerNumber = players.length + 1;
 
             const player = {
                 id: playerId,
                 name: data.name,
                 playerNumber: playerNumber,
                 position: 0,
-                connected: true,
                 ws: ws
             };
 
@@ -143,7 +146,6 @@ function handleMessage(ws, data) {
                     name: player.name,
                     playerNumber: player.playerNumber,
                     position: player.position,
-                    connected: player.connected,
                     isLeader: player.id === leaderId
                 }
             });
@@ -199,9 +201,8 @@ function handleMessage(ws, data) {
                         position: getFinishPosition()
                     });
 
-                    // Check if all connected players finished
-                    const connectedPlayers = players.filter(p => p.connected);
-                    if (connectedPlayers.length > 0 && connectedPlayers.every(p => p.position >= 32000)) {
+                    // Check if all players finished
+                    if (players.length > 0 && players.every(p => p.position >= 32000)) {
                         gameState = 'FINISHED';
                         broadcast({ type: 'raceFinished' });
                     }
@@ -232,8 +233,7 @@ function resetGame() {
     console.log('resetGame() called');
     gameState = 'WAITING';
 
-    // Remove disconnected players and reset connected players
-    players = players.filter(p => p.connected);
+    // Reset all player positions (disconnected players are already removed from array)
     players.forEach(p => {
         p.position = 0;
         delete p.finished;
@@ -244,6 +244,22 @@ function resetGame() {
     console.log('Broadcasting resetRace to all clients');
     broadcast({ type: 'resetRace' });
     console.log('Reset complete');
+}
+
+function checkAndResetIfNoControllers() {
+    // Check if there are any controllers/players left
+    if (players.length === 0) {
+        console.log('No controllers connected - performing full game reset');
+
+        // Complete game reset
+        gameState = 'WAITING';
+        leaderId = null;
+        pendingDisplayUpdates = [];
+
+        // Notify all displays that the game has been fully reset
+        broadcast({ type: 'resetRace' });
+        console.log('Full game reset complete - ready for new players');
+    }
 }
 
 function broadcast(data) {
