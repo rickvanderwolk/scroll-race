@@ -7,7 +7,7 @@ let startTime = null;
 let gameState = 'JOIN';
 let lastUpdateTime = 0;
 
-const finishPosition = 64000;
+const finishPosition = 32000;
 const UPDATE_RATE = 50; // ms (20 updates per second)
 const raceTrackElement = document.getElementById('race-track');
 const positionTextElement = document.getElementById('position-text');

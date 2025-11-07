@@ -191,7 +191,7 @@ function handleMessage(ws, data) {
                 });
 
                 // Check if player finished (only broadcast if time is provided)
-                if (data.position >= 64000 && data.time) {
+                if (data.position >= 32000 && data.time) {
                     broadcast({
                         type: 'playerFinished',
                         playerId: currentPlayer.id,
@@ -201,7 +201,7 @@ function handleMessage(ws, data) {
 
                     // Check if all connected players finished
                     const connectedPlayers = players.filter(p => p.connected);
-                    if (connectedPlayers.length > 0 && connectedPlayers.every(p => p.position >= 64000)) {
+                    if (connectedPlayers.length > 0 && connectedPlayers.every(p => p.position >= 32000)) {
                         gameState = 'FINISHED';
                         broadcast({ type: 'raceFinished' });
                     }
@@ -225,7 +225,7 @@ function handleMessage(ws, data) {
 }
 
 function getFinishPosition() {
-    return players.filter(p => p.position >= 64000).length;
+    return players.filter(p => p.position >= 32000).length;
 }
 
 function resetGame() {

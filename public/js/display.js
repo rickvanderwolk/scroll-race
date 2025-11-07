@@ -227,7 +227,7 @@ function initRaceDisplay() {
 }
 
 function updateRaceDisplay() {
-    const finishPosition = 64000;
+    const finishPosition = 32000;
 
     // Sort players by position
     const sortedPlayers = [...players].sort((a, b) => b.position - a.position);

@@ -9,7 +9,7 @@ const MODE_FINISHED = 3;
 
 let currentMode = null;
 let position = 0;
-const finishPosition = 64000;
+const finishPosition = 32000;
 
 let startTime = null;
 let timeElapsed = null;
