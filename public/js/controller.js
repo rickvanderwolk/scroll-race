@@ -11,17 +11,6 @@ const finishPosition = 32000;
 const UPDATE_RATE = 50; // ms (20 updates per second)
 const raceTrackElement = document.getElementById('race-track');
 const positionTextElement = document.getElementById('position-text');
-const debugElement = document.getElementById('debug-info');
-
-let scrollEventCount = 0;
-let extendCount = 0;
-
-function debug(msg) {
-    if (debugElement) {
-        scrollEventCount++;
-        debugElement.innerHTML = `Events: ${scrollEventCount}<br>Extends: ${extendCount}<br>${msg}`;
-    }
-}
 
 // Connect to WebSocket
 function connect() {
@@ -29,7 +18,6 @@ function connect() {
     ws = new WebSocket(`${protocol}//${window.location.host}`);
 
     ws.onopen = () => {
-        console.log('Connected to server');
     };
 
     ws.onmessage = (event) => {
@@ -38,13 +26,11 @@ function connect() {
     };
 
     ws.onclose = () => {
-        console.log('Disconnected from server');
         showScreen('join');
         setTimeout(connect, 3000);
     };
 
     ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
     };
 }
 
@@ -85,11 +71,8 @@ function handleMessage(data) {
             break;
 
         case 'resetRace':
-            console.log('Received resetRace from server');
-
             // FIRST: Scroll to top (while body is still scrollable)
             window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-            console.log('Scrolled to top');
 
             gameState = 'WAITING';
             position = 0;
@@ -99,14 +82,12 @@ function handleMessage(data) {
             const raceTrack = document.getElementById('race-track');
             if (raceTrack) {
                 raceTrack.style.height = '0px';
-                console.log('Race track reset to 0px');
             }
 
             // Clear finish info
             document.getElementById('finish-time').textContent = '';
             document.getElementById('finish-position').textContent = '';
 
-            console.log('Calling showScreen(waiting)');
             showScreen('waiting');
 
             // Hide reset button
@@ -116,18 +97,15 @@ function handleMessage(data) {
             if (isLeader) {
                 document.getElementById('leader-controls').classList.remove('hidden');
                 document.getElementById('non-leader-message').classList.add('hidden');
-                console.log('Showing leader controls');
             } else {
                 document.getElementById('leader-controls').classList.add('hidden');
                 document.getElementById('non-leader-message').classList.remove('hidden');
-                console.log('Showing non-leader message');
             }
             break;
     }
 }
 
 function showScreen(screenName) {
-    console.log('showScreen called with:', screenName);
     document.querySelectorAll('.screen').forEach(screen => screen.classList.add('hidden'));
 
     // Remove racing class from body by default
@@ -141,30 +119,19 @@ function showScreen(screenName) {
 
     if (screenName === 'join') {
         document.getElementById('join-screen').classList.remove('hidden');
-        console.log('Join screen shown');
     } else if (screenName === 'waiting') {
         const waitingScreen = document.getElementById('waiting-screen');
         waitingScreen.classList.remove('hidden');
-        console.log('Waiting screen shown');
-        console.log('Waiting screen classes:', waitingScreen.className);
-        console.log('Waiting screen display:', window.getComputedStyle(waitingScreen).display);
-
-        const finishedScreen = document.getElementById('finished-screen');
-        console.log('Finished screen classes:', finishedScreen.className);
-        console.log('Finished screen display:', window.getComputedStyle(finishedScreen).display);
     } else if (screenName === 'countdown') {
         document.getElementById('countdown-screen').classList.remove('hidden');
-        console.log('Countdown screen shown');
     } else if (screenName === 'race') {
         document.getElementById('race-screen').classList.remove('hidden');
         document.body.classList.add('racing');
         if (positionText) {
             positionText.style.display = 'block';
         }
-        console.log('Race screen shown');
     } else if (screenName === 'finished') {
         document.getElementById('finished-screen').classList.remove('hidden');
-        console.log('Finished screen shown');
     }
 }
 
@@ -172,8 +139,6 @@ function startRace() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     position = 0;
     startTime = Date.now();
-    scrollEventCount = 0;
-    extendCount = 0;
 
     // Use absolute height instead of percentage (like original used screen.height)
     // Start with 2x screen height to ensure scrollability
@@ -181,13 +146,6 @@ function startRace() {
     raceTrackElement.style.height = initialHeight + 'px';
 
     positionTextElement.textContent = 'GO!';
-
-    debug(`RACE STARTED!<br>State: ${gameState}<br>Track: ${initialHeight}px`);
-
-    // Test scroll immediately
-    setTimeout(() => {
-        debug(`After 1sec:<br>CanScroll: ${document.body.scrollHeight > window.innerHeight}<br>ScrollH: ${document.body.scrollHeight}<br>InnerH: ${window.innerHeight}`);
-    }, 1000);
 }
 
 // Join button
@@ -219,9 +177,7 @@ document.getElementById('start-button').addEventListener('click', () => {
 
 // Reset button (for leader)
 document.getElementById('reset-button').addEventListener('click', () => {
-    console.log('Reset button clicked, isLeader:', isLeader);
     if (isLeader) {
-        console.log('Sending resetRace to server');
         ws.send(JSON.stringify({
             type: 'resetRace'
         }));
@@ -247,8 +203,6 @@ window.onscroll = function(ev) {
         const method3 = scrollBottom >= (bodyHeight - 100); // 100px buffer (more aggressive for Android)
 
         const scrolledToBottom = method1 || method2 || method3;
-
-        debug(`ScrollY: ${Math.round(scrollY)}<br>ScrollBot: ${Math.round(scrollBottom)}<br>BodyH: ${Math.round(bodyHeight)}<br>Dist: ${Math.round(distanceFromBottom)}<br>Bottom: ${scrolledToBottom}<br>Pos: ${position}`);
 
         if (scrolledToBottom) {
             if (parseInt(position) >= finishPosition) {
@@ -279,8 +233,6 @@ function extendRaceTrack() {
     const newHeight = currentHeight + screen.height;
     // Use screen.height for better mobile compatibility (like original version)
     raceTrackElement.style.height = newHeight + 'px';
-    extendCount++;
-    debug(`EXTENDED!<br>Old: ${currentHeight}<br>New: ${newHeight}<br>ScreenH: ${screen.height}`);
 }
 
 function updatePositionLocal() {
