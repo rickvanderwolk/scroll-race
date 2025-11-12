@@ -19,8 +19,12 @@ body {
 
 body.racing {
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     height: auto;
+    min-height: 100vh;
     touch-action: manipulation;
+    /* Ensure body is properly scrollable on Android */
+    -webkit-overflow-scrolling: touch;
 }
 
 #controller-container {
@@ -32,6 +36,12 @@ body.racing {
     justify-content: center;
     padding: 20px;
     box-sizing: border-box;
+}
+
+body.racing #controller-container {
+    padding: 0;
+    justify-content: flex-start;
+    min-height: auto;
 }
 
 .screen {
@@ -188,6 +198,8 @@ body.racing {
     width: 100%;
     min-height: 100vh;
     padding: 0;
+    max-width: none;
+    display: block;
 }
 
 #race-track {

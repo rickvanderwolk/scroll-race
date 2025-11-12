@@ -203,15 +203,37 @@ document.getElementById('reset-button').addEventListener('click', () => {
     }
 });
 
-// Scroll handling for race
-window.addEventListener('scroll', () => {
+// Scroll handling for race - using onscroll like original for better Android compatibility
+window.onscroll = function(ev) {
     if (gameState === 'RACING') {
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        // Check if we've scrolled to the bottom
+        const innerHeight = window.innerHeight;
+        const scrollY = window.scrollY;
+        const bodyHeight = document.body.offsetHeight;
+        const scrolledToBottom = (innerHeight + scrollY) >= bodyHeight;
+
+        // Debug logging (remove after testing)
+        console.log('Scroll:', {
+            innerHeight,
+            scrollY,
+            bodyHeight,
+            scrolledToBottom,
+            position,
+            trackHeight: raceTrackElement.style.height
+        });
+
+        if (scrolledToBottom) {
             if (parseInt(position) >= finishPosition) {
                 finishRace();
             } else {
-                // Always update position immediately for smooth scrolling
+                // Always update position immediately for smooth scrolling (like original)
                 updatePositionLocal();
+
+                // Update UI (like original)
+                positionTextElement.textContent = position;
+
+                // Extend track (like original)
+                extendRaceTrack();
 
                 // Throttle server updates to reduce load
                 const now = Date.now();
@@ -219,14 +241,10 @@ window.addEventListener('scroll', () => {
                     sendPositionToServer();
                     lastUpdateTime = now;
                 }
-
-                // Update UI and extend track
-                positionTextElement.textContent = position;
-                extendRaceTrack();
             }
         }
     }
-});
+};
 
 function extendRaceTrack() {
     const currentHeight = raceTrackElement.offsetHeight;
