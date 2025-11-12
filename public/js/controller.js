@@ -14,11 +14,12 @@ const positionTextElement = document.getElementById('position-text');
 const debugElement = document.getElementById('debug-info');
 
 let scrollEventCount = 0;
+let extendCount = 0;
 
 function debug(msg) {
     if (debugElement) {
         scrollEventCount++;
-        debugElement.innerHTML = `Events: ${scrollEventCount}<br>${msg}`;
+        debugElement.innerHTML = `Events: ${scrollEventCount}<br>Extends: ${extendCount}<br>${msg}`;
     }
 }
 
@@ -171,6 +172,8 @@ function startRace() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     position = 0;
     startTime = Date.now();
+    scrollEventCount = 0;
+    extendCount = 0;
 
     // Use absolute height instead of percentage (like original used screen.height)
     // Start with 2x screen height to ensure scrollability
@@ -227,8 +230,6 @@ document.getElementById('reset-button').addEventListener('click', () => {
 
 // Scroll handling for race - using onscroll like original for better Android compatibility
 window.onscroll = function(ev) {
-    debug(`State: ${gameState}<br>ScrollY: ${Math.round(window.scrollY)}<br>Pos: ${position}`);
-
     if (gameState === 'RACING') {
         // Check if we've scrolled to the bottom
         const innerHeight = window.innerHeight;
@@ -236,14 +237,18 @@ window.onscroll = function(ev) {
         const bodyHeight = document.body.offsetHeight;
         const trackHeight = raceTrackElement.offsetHeight;
 
+        // Calculate how close we are
+        const scrollBottom = innerHeight + scrollY;
+        const distanceFromBottom = bodyHeight - scrollBottom;
+
         // Try multiple detection methods
-        const method1 = (innerHeight + scrollY) >= bodyHeight;
-        const method2 = (innerHeight + scrollY) >= (bodyHeight - 50); // 50px buffer
-        const method3 = (innerHeight + scrollY) >= trackHeight;
+        const method1 = scrollBottom >= bodyHeight;
+        const method2 = scrollBottom >= (bodyHeight - 50); // 50px buffer
+        const method3 = scrollBottom >= (bodyHeight - 100); // 100px buffer (more aggressive for Android)
 
-        const scrolledToBottom = method1 || method2;
+        const scrolledToBottom = method1 || method2 || method3;
 
-        debug(`State: ${gameState}<br>ScrollY: ${Math.round(scrollY)}<br>InnerH: ${Math.round(innerHeight)}<br>BodyH: ${Math.round(bodyHeight)}<br>TrackH: ${Math.round(trackHeight)}<br>Bottom: ${scrolledToBottom}<br>Pos: ${position}`);
+        debug(`ScrollY: ${Math.round(scrollY)}<br>ScrollBot: ${Math.round(scrollBottom)}<br>BodyH: ${Math.round(bodyHeight)}<br>Dist: ${Math.round(distanceFromBottom)}<br>Bottom: ${scrolledToBottom}<br>Pos: ${position}`);
 
         if (scrolledToBottom) {
             if (parseInt(position) >= finishPosition) {
@@ -271,8 +276,11 @@ window.onscroll = function(ev) {
 
 function extendRaceTrack() {
     const currentHeight = raceTrackElement.offsetHeight;
+    const newHeight = currentHeight + screen.height;
     // Use screen.height for better mobile compatibility (like original version)
-    raceTrackElement.style.height = currentHeight + screen.height + 'px';
+    raceTrackElement.style.height = newHeight + 'px';
+    extendCount++;
+    debug(`EXTENDED!<br>Old: ${currentHeight}<br>New: ${newHeight}<br>ScreenH: ${screen.height}`);
 }
 
 function updatePositionLocal() {
