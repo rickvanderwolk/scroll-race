@@ -19,7 +19,12 @@ body {
 
 body.racing {
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     height: auto;
+    min-height: 100vh;
+    touch-action: manipulation;
+    /* Ensure body is properly scrollable on Android */
+    -webkit-overflow-scrolling: touch;
 }
 
 #controller-container {
@@ -31,6 +36,15 @@ body.racing {
     justify-content: center;
     padding: 20px;
     box-sizing: border-box;
+}
+
+body.racing #controller-container {
+    padding: 0;
+    justify-content: flex-start;
+    min-height: auto;
+    /* Allow container to grow with race track */
+    height: auto;
+    display: block;
 }
 
 .screen {
@@ -185,21 +199,22 @@ body.racing {
 /* Race Screen */
 #race-screen {
     width: 100%;
-    min-height: 100vh;
     padding: 0;
+    max-width: none;
+    display: block;
+    /* Don't set any height constraints - let the race-track dictate height */
 }
 
 #race-track {
-    height: 200%;
+    /* Height will be set dynamically via JS */
     width: calc(100% - 100px);
     background: #333;
     border: 50px dashed #fff;
     border-top: 0;
     border-bottom: 0;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding-top: 50px;
+    margin: 0 auto;
+    position: relative;
+    /* Remove flex that might interfere */
 }
 
 #position-text {

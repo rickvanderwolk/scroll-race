@@ -11,6 +11,17 @@ const finishPosition = 32000;
 const UPDATE_RATE = 50; // ms (20 updates per second)
 const raceTrackElement = document.getElementById('race-track');
 const positionTextElement = document.getElementById('position-text');
+const debugElement = document.getElementById('debug-info');
+
+let scrollEventCount = 0;
+let extendCount = 0;
+
+function debug(msg) {
+    if (debugElement) {
+        scrollEventCount++;
+        debugElement.innerHTML = `Events: ${scrollEventCount}<br>Extends: ${extendCount}<br>${msg}`;
+    }
+}
 
 // Connect to WebSocket
 function connect() {
@@ -77,18 +88,18 @@ function handleMessage(data) {
             console.log('Received resetRace from server');
 
             // FIRST: Scroll to top (while body is still scrollable)
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             console.log('Scrolled to top');
 
             gameState = 'WAITING';
             position = 0;
             startTime = null;
 
-            // Reset race track to normal height
+            // Reset race track to minimal height
             const raceTrack = document.getElementById('race-track');
             if (raceTrack) {
-                raceTrack.style.height = '200%';
-                console.log('Race track reset to 200%');
+                raceTrack.style.height = '0px';
+                console.log('Race track reset to 0px');
             }
 
             // Clear finish info
@@ -158,11 +169,25 @@ function showScreen(screenName) {
 }
 
 function startRace() {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     position = 0;
     startTime = Date.now();
-    raceTrackElement.style.height = '200%';
+    scrollEventCount = 0;
+    extendCount = 0;
+
+    // Use absolute height instead of percentage (like original used screen.height)
+    // Start with 2x screen height to ensure scrollability
+    const initialHeight = screen.height * 2;
+    raceTrackElement.style.height = initialHeight + 'px';
+
     positionTextElement.textContent = 'GO!';
+
+    debug(`RACE STARTED!<br>State: ${gameState}<br>Track: ${initialHeight}px`);
+
+    // Test scroll immediately
+    setTimeout(() => {
+        debug(`After 1sec:<br>CanScroll: ${document.body.scrollHeight > window.innerHeight}<br>ScrollH: ${document.body.scrollHeight}<br>InnerH: ${window.innerHeight}`);
+    }, 1000);
 }
 
 // Join button
@@ -203,36 +228,68 @@ document.getElementById('reset-button').addEventListener('click', () => {
     }
 });
 
-// Scroll handling for race
-window.addEventListener('scroll', () => {
+// Scroll handling for race - using onscroll like original for better Android compatibility
+window.onscroll = function(ev) {
     if (gameState === 'RACING') {
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        // Check if we've scrolled to the bottom
+        const innerHeight = window.innerHeight;
+        const scrollY = window.scrollY;
+        const bodyHeight = document.body.offsetHeight;
+        const trackHeight = raceTrackElement.offsetHeight;
+
+        // Calculate how close we are
+        const scrollBottom = innerHeight + scrollY;
+        const distanceFromBottom = bodyHeight - scrollBottom;
+
+        // Try multiple detection methods
+        const method1 = scrollBottom >= bodyHeight;
+        const method2 = scrollBottom >= (bodyHeight - 50); // 50px buffer
+        const method3 = scrollBottom >= (bodyHeight - 100); // 100px buffer (more aggressive for Android)
+
+        const scrolledToBottom = method1 || method2 || method3;
+
+        debug(`ScrollY: ${Math.round(scrollY)}<br>ScrollBot: ${Math.round(scrollBottom)}<br>BodyH: ${Math.round(bodyHeight)}<br>Dist: ${Math.round(distanceFromBottom)}<br>Bottom: ${scrolledToBottom}<br>Pos: ${position}`);
+
+        if (scrolledToBottom) {
             if (parseInt(position) >= finishPosition) {
                 finishRace();
             } else {
-                // Throttle position updates to reduce server load
+                // Always update position immediately for smooth scrolling (like original)
+                updatePositionLocal();
+
+                // Update UI (like original)
+                positionTextElement.textContent = position;
+
+                // Extend track (like original)
+                extendRaceTrack();
+
+                // Throttle server updates to reduce load
                 const now = Date.now();
                 if (now - lastUpdateTime >= UPDATE_RATE) {
-                    updatePosition();
+                    sendPositionToServer();
                     lastUpdateTime = now;
                 }
-                // Always update UI and extend track (no throttle for better UX)
-                positionTextElement.textContent = position;
-                extendRaceTrack();
             }
         }
     }
-});
+};
 
 function extendRaceTrack() {
     const currentHeight = raceTrackElement.offsetHeight;
-    raceTrackElement.style.height = currentHeight + window.innerHeight + 'px';
+    const newHeight = currentHeight + screen.height;
+    // Use screen.height for better mobile compatibility (like original version)
+    raceTrackElement.style.height = newHeight + 'px';
+    extendCount++;
+    debug(`EXTENDED!<br>Old: ${currentHeight}<br>New: ${newHeight}<br>ScreenH: ${screen.height}`);
 }
 
-function updatePosition() {
+function updatePositionLocal() {
+    // Update local position immediately (like original version)
     position = parseInt(raceTrackElement.style.height) || 0;
+}
 
-    // Send position update to server
+function sendPositionToServer() {
+    // Send position update to server (throttled)
     ws.send(JSON.stringify({
         type: 'updatePosition',
         position: position
@@ -253,7 +310,7 @@ function finishRace() {
         }));
 
         // Scroll to top to show finish screen properly
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
         // Show finish screen
         showScreen('finished');
