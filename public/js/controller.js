@@ -94,11 +94,11 @@ function handleMessage(data) {
             position = 0;
             startTime = null;
 
-            // Reset race track to normal height
+            // Reset race track to minimal height
             const raceTrack = document.getElementById('race-track');
             if (raceTrack) {
-                raceTrack.style.height = '200%';
-                console.log('Race track reset to 200%');
+                raceTrack.style.height = '0px';
+                console.log('Race track reset to 0px');
             }
 
             // Clear finish info
@@ -171,10 +171,15 @@ function startRace() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     position = 0;
     startTime = Date.now();
-    raceTrackElement.style.height = '200%';
+
+    // Use absolute height instead of percentage (like original used screen.height)
+    // Start with 2x screen height to ensure scrollability
+    const initialHeight = screen.height * 2;
+    raceTrackElement.style.height = initialHeight + 'px';
+
     positionTextElement.textContent = 'GO!';
 
-    debug(`RACE STARTED!<br>State: ${gameState}<br>Track: ${raceTrackElement.style.height}`);
+    debug(`RACE STARTED!<br>State: ${gameState}<br>Track: ${initialHeight}px`);
 
     // Test scroll immediately
     setTimeout(() => {
