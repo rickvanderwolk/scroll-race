@@ -11,6 +11,16 @@ const finishPosition = 32000;
 const UPDATE_RATE = 50; // ms (20 updates per second)
 const raceTrackElement = document.getElementById('race-track');
 const positionTextElement = document.getElementById('position-text');
+const debugElement = document.getElementById('debug-info');
+
+let scrollEventCount = 0;
+
+function debug(msg) {
+    if (debugElement) {
+        scrollEventCount++;
+        debugElement.innerHTML = `Events: ${scrollEventCount}<br>${msg}`;
+    }
+}
 
 // Connect to WebSocket
 function connect() {
@@ -163,6 +173,13 @@ function startRace() {
     startTime = Date.now();
     raceTrackElement.style.height = '200%';
     positionTextElement.textContent = 'GO!';
+
+    debug(`RACE STARTED!<br>State: ${gameState}<br>Track: ${raceTrackElement.style.height}`);
+
+    // Test scroll immediately
+    setTimeout(() => {
+        debug(`After 1sec:<br>CanScroll: ${document.body.scrollHeight > window.innerHeight}<br>ScrollH: ${document.body.scrollHeight}<br>InnerH: ${window.innerHeight}`);
+    }, 1000);
 }
 
 // Join button
@@ -205,22 +222,23 @@ document.getElementById('reset-button').addEventListener('click', () => {
 
 // Scroll handling for race - using onscroll like original for better Android compatibility
 window.onscroll = function(ev) {
+    debug(`State: ${gameState}<br>ScrollY: ${Math.round(window.scrollY)}<br>Pos: ${position}`);
+
     if (gameState === 'RACING') {
         // Check if we've scrolled to the bottom
         const innerHeight = window.innerHeight;
         const scrollY = window.scrollY;
         const bodyHeight = document.body.offsetHeight;
-        const scrolledToBottom = (innerHeight + scrollY) >= bodyHeight;
+        const trackHeight = raceTrackElement.offsetHeight;
 
-        // Debug logging (remove after testing)
-        console.log('Scroll:', {
-            innerHeight,
-            scrollY,
-            bodyHeight,
-            scrolledToBottom,
-            position,
-            trackHeight: raceTrackElement.style.height
-        });
+        // Try multiple detection methods
+        const method1 = (innerHeight + scrollY) >= bodyHeight;
+        const method2 = (innerHeight + scrollY) >= (bodyHeight - 50); // 50px buffer
+        const method3 = (innerHeight + scrollY) >= trackHeight;
+
+        const scrolledToBottom = method1 || method2;
+
+        debug(`State: ${gameState}<br>ScrollY: ${Math.round(scrollY)}<br>InnerH: ${Math.round(innerHeight)}<br>BodyH: ${Math.round(bodyHeight)}<br>TrackH: ${Math.round(trackHeight)}<br>Bottom: ${scrolledToBottom}<br>Pos: ${position}`);
 
         if (scrolledToBottom) {
             if (parseInt(position) >= finishPosition) {
