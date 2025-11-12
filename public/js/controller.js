@@ -210,13 +210,17 @@ window.addEventListener('scroll', () => {
             if (parseInt(position) >= finishPosition) {
                 finishRace();
             } else {
-                // Throttle position updates to reduce server load
+                // Always update position immediately for smooth scrolling
+                updatePositionLocal();
+
+                // Throttle server updates to reduce load
                 const now = Date.now();
                 if (now - lastUpdateTime >= UPDATE_RATE) {
-                    updatePosition();
+                    sendPositionToServer();
                     lastUpdateTime = now;
                 }
-                // Always update UI and extend track (no throttle for better UX)
+
+                // Update UI and extend track
                 positionTextElement.textContent = position;
                 extendRaceTrack();
             }
@@ -226,13 +230,17 @@ window.addEventListener('scroll', () => {
 
 function extendRaceTrack() {
     const currentHeight = raceTrackElement.offsetHeight;
-    raceTrackElement.style.height = currentHeight + window.innerHeight + 'px';
+    // Use screen.height for better mobile compatibility (like original version)
+    raceTrackElement.style.height = currentHeight + screen.height + 'px';
 }
 
-function updatePosition() {
+function updatePositionLocal() {
+    // Update local position immediately (like original version)
     position = parseInt(raceTrackElement.style.height) || 0;
+}
 
-    // Send position update to server
+function sendPositionToServer() {
+    // Send position update to server (throttled)
     ws.send(JSON.stringify({
         type: 'updatePosition',
         position: position
