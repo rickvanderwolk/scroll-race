@@ -20,6 +20,8 @@ body {
 body.racing {
     overflow-y: auto !important;
     height: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
 }
 
 #controller-container {

@@ -77,7 +77,7 @@ function handleMessage(data) {
             console.log('Received resetRace from server');
 
             // FIRST: Scroll to top (while body is still scrollable)
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             console.log('Scrolled to top');
 
             gameState = 'WAITING';
@@ -158,7 +158,7 @@ function showScreen(screenName) {
 }
 
 function startRace() {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     position = 0;
     startTime = Date.now();
     raceTrackElement.style.height = '200%';
@@ -222,7 +222,7 @@ window.addEventListener('scroll', () => {
             }
         }
     }
-});
+}, { passive: true });
 
 function extendRaceTrack() {
     const currentHeight = raceTrackElement.offsetHeight;
@@ -253,7 +253,7 @@ function finishRace() {
         }));
 
         // Scroll to top to show finish screen properly
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
         // Show finish screen
         showScreen('finished');
