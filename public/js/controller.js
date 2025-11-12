@@ -222,7 +222,7 @@ window.addEventListener('scroll', () => {
             }
         }
     }
-}, { passive: true });
+});
 
 function extendRaceTrack() {
     const currentHeight = raceTrackElement.offsetHeight;
