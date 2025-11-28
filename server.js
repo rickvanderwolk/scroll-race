@@ -9,16 +9,6 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-// Allow embedding in iframes (disabled by default)
-if (process.env.ALLOW_IFRAME === 'true') {
-    app.use((req, res, next) => {
-        res.removeHeader('X-Frame-Options');
-        res.setHeader('Content-Security-Policy', "frame-ancestors *");
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        next();
-    });
-}
-
 // Serve static files
 app.use(express.static('public'));
 
