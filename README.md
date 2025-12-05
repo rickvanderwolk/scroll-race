@@ -34,6 +34,6 @@ Server runs on `http://localhost:3000`
 
 1. Open the display on a big screen
 2. Players scan the QR code with their phone
-3. Choose a color and join the race
+3. Enter your name and join the race
 4. Scroll on your phone to race!
 5. First to finish wins 🏆
